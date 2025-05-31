@@ -7,6 +7,7 @@ error_reporting(E_ALL);
 require_once $_SERVER['DOCUMENT_ROOT'] . '/ibm5a/config/database.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/ibm5a/app/models/Telefono.php';
 
+require_once $_SERVER['DOCUMENT_ROOT'] . '/Apple5b/app/models/Persona.php';
 class TelefonoController {
     private $telefono;
     private $db;
@@ -14,12 +15,20 @@ class TelefonoController {
     public function __construct() {
         $this->db = (new Database())->getConnection();
         $this->telefono = new Telefono($this->db);
+         $this->persona = new Persona($this->db);
     }
 
     // Mostrar todos los teléfonos
     public function index() {
         $telefonos = $this->telefono->read();
         require_once '../app/views/telefono/index.php';
+    }
+    
+      public function createForm() {
+
+
+        $personas = $this->persona->read();
+        require_once '../app/views/telefono/create.php';
     }
 
     public function create() {
@@ -44,6 +53,7 @@ class TelefonoController {
     public function edit($id) {
         $this->telefono->id = $id;
         $telefono = $this->telefono->readOne();
+         $personas = $this->persona->read();
 
         if (!$telefono) {
             die("Error: No se encontró el registro.");
@@ -105,6 +115,20 @@ class TelefonoController {
         die();
     }
 }
+
+public function api() {
+
+        while (ob_get_level()) {
+            ob_end_clean();
+        }
+        $telefonos = $this->telefono->getAll();
+        header('Content-Type: application/json');
+        echo json_encode($telefonos);
+        exit;
+    }
+
+
+
 
 if (isset($_GET['action'])) {
     $controller = new TelefonoController();
